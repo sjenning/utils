@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: suspend-image-pruner
+  name: suspend-image-pruner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suspend-image-pruner
+  template:
+    metadata:
+      labels:
+        app: suspend-image-pruner
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/suspend-image-pruner
+        env:
+        - name: KUBECONFIG
+          value: /etc/kubernetes/kubeconfig
+        image: quay.io/sjenning/utils:latest
+        imagePullPolicy: Always
+        name: suspend-image-pruner
+        volumeMounts:
+        - mountPath: /etc/kubernetes
+          name: cluster-pool-kubeconfig
+      volumes:
+      - name: cluster-pool-kubeconfig
+        secret:
+          defaultMode: 420
+          secretName: cluster-pool-kubeconfig
